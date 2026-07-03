@@ -1,0 +1,40 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  password  String // To store hashed passwords securely
+  name      String?
+  createdAt DateTime @default(now())
+  notes     Note[] // Relation field linking to Notes
+}
+
+model Note {
+  id        String   @id @default(cuid())
+  title     String
+  content   String
+  createdAt DateTime @default(now())
+  
+  // 1. Add the foreign key field
+  userId    String
+  
+  // 2. Setup the relation link back to the User model
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  
+  chunks    Chunk[]
+}
+
+model Chunk {
+  id        String                 @id @default(cuid())
+  content   String
+  embedding Unsupported("vector")? // your pgvector definition
+  noteId    String
+  note      Note                   @relation(fields: [noteId], references: [id], onDelete: Cascade)
+}
