@@ -19,7 +19,7 @@ export async function GET(
   if (!note) return NextResponse.json({ error: "Not found" }, { status: 404 });
   return NextResponse.json(note);
 }
-
+export const dynamic = "force-dynamic"
 export async function PUT(
   req: NextRequest,
   { params }: RouteContext

@@ -12,7 +12,7 @@ export const runtime = "nodejs";
 PDFParse.setWorker(
   pathToFileURL(resolve(process.cwd(), "node_modules/pdf-parse/dist/pdf-parse/web/pdf.worker.mjs")).href
 );
-
+export const dynamic = "force-dynamic"
 export async function POST(req: NextRequest) {
   let parser: PDFParse | null = null;
 

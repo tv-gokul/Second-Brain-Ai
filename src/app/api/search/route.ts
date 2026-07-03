@@ -2,6 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import { embedText, toVectorLiteral } from "@/lib/embeddings";
 
+export const dynamic = "force-dynamic"
 export async function POST(req: NextRequest) {
   const { query, limit = 8 } = await req.json();
   if (!query) {

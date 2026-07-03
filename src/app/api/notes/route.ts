@@ -4,6 +4,7 @@ import { auth } from "@/lib/auth"; // Imports your session helper
 import { embedText, toVectorLiteral } from "@/lib/embeddings";
 
 // 1. GET Handler: Fetch notes belonging ONLY to the logged-in user
+
 export async function GET() {
   try {
     const session = await auth();
