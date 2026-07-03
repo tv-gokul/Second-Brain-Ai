@@ -10,35 +10,77 @@ export default function NoteDetailPage() {
   const [content, setContent] = useState("");
   const [loading, setLoading] = useState(true);
   const [saving, setSaving] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
+    let isMounted = true;
+    setLoading(true);
+    setError(null);
+
     fetch(`/api/notes/${id}`)
-      .then((r) => r.json())
+      .then((r) => {
+        if (!r.ok) throw new Error("Failed to load note");
+        return r.json();
+      })
       .then((note) => {
-        setTitle(note.title);
-        setContent(note.content);
-        setLoading(false);
+        if (isMounted) {
+          setTitle(note.title || "");
+          setContent(note.content || "");
+          setLoading(false);
+        }
+      })
+      .catch((err) => {
+        if (isMounted) {
+          setError(err.message);
+          setLoading(false);
+        }
       });
-  }, [id]);
+
+    return () => {
+      isMounted = false; // Prevents state updates on unmounted component
+    };
+  }, [id]); // Fixed: Added id dependency
 
   async function handleSave() {
-    setSaving(true);
-    await fetch(`/api/notes/${id}`, {
-      method: "PUT",
-      headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ title, content }),
-    });
-    setSaving(false);
+    try {
+      setSaving(true);
+      const r = await fetch(`/api/notes/${id}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ title, content }),
+      });
+      if (!r.ok) throw new Error("Failed to save changes");
+    } catch (err) {
+      alert("Error saving note. Please try again.");
+    } finally {
+      setSaving(false);
+    }
   }
 
   async function handleDelete() {
     if (!confirm("Delete this note permanently?")) return;
-    await fetch(`/api/notes/${id}`, { method: "DELETE" });
-    router.push("/");
+    try {
+      const r = await fetch(`/api/notes/${id}`, { method: "DELETE" });
+      if (!r.ok) throw new Error("Failed to delete");
+      router.push("/");
+    } catch (err) {
+      alert("Could not delete note.");
+    }
   }
 
   if (loading) {
     return <div className="max-w-3xl mx-auto px-6 py-12 text-paper-dim">loading…</div>;
+  }
+
+  if (error) {
+    return (
+      <div className="max-w-3xl mx-auto px-6 py-12 text-rust space-y-4">
+        <p>{error}</p>
+        <button onClick={() => router.push("/")} className="underline text-xs">
+          Return Home
+        </button>
+      </div>
+    );
   }
 
   return (
@@ -47,12 +89,14 @@ export default function NoteDetailPage() {
         value={title}
         onChange={(e) => setTitle(e.target.value)}
         className="w-full bg-transparent border-b border-ink-line pb-2 font-display text-2xl font-semibold focus:outline-none focus:border-moss"
+        placeholder="Untitled Note"
       />
       <textarea
         value={content}
         onChange={(e) => setContent(e.target.value)}
         rows={16}
         className="w-full bg-ink-panel border border-ink-line rounded-md p-4 text-sm leading-relaxed focus:outline-none focus:border-moss resize-y"
+        placeholder="Start writing..."
       />
       <div className="flex justify-between">
         <button
