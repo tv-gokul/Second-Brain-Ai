@@ -2,6 +2,9 @@ import { NextResponse } from "next/server";
 import { prisma } from "@/lib/db";
 import bcrypt from "bcryptjs";
 
+// CRITICAL FIX: Bypasses static pre-rendering evaluation during 'npm run build'
+export const dynamic = "force-dynamic";
+
 export async function POST(req: Request) {
   try {
     // Read the raw body text first to bypass any internal parsing hitches
