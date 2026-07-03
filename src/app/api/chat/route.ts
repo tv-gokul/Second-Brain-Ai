@@ -3,7 +3,7 @@ import { prisma } from "@/lib/db";
 import { auth } from "@/lib/auth"; // 1. Imported authentication helper
 import { embedText, toVectorLiteral } from "@/lib/embeddings";
 import { answerFromChunks, RetrievedChunk } from "@/lib/llm";
-
+export const dynamic = "force-dynamic";
 export async function POST(req: NextRequest) {
   try {
     // 2. Authenticate the user session
