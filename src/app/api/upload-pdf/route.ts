@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import pdfParse from "pdf-parse"; // Note the lowercase 'p' for default import in v1.1.1
+import pdfParse from "pdf-parse/lib/pdf-parse.js"; // Note the lowercase 'p' for default import in v1.1.1
 import { prisma } from "@/lib/db";
 import { chunkText } from "@/lib/chunk";
 import { embedBatch, toVectorLiteral } from "@/lib/embeddings";
